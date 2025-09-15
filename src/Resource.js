@@ -5,7 +5,8 @@ class Resources {
             sky: "/sprites/sky.png",
             ground: "sprites/ground.png",
             hero: "/sprites/hero-sheet.png",
-            shadow: "/sprites/shadow.png"
+            shadow: "/sprites/shadow.png",
+            rod: "/sprites/rod.png",
         };
         
         // Keep images

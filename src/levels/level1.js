@@ -12,6 +12,8 @@ walls.add(`128,80`);
 walls.add(`144,80`);
 walls.add(`160,80`);
 
+/*
+
 walls.add(`128,48`);
 walls.add(`144,48`);
 
@@ -61,4 +63,4 @@ walls.add(`240,32`);
 walls.add(`256,96`);
 walls.add(`256,80`);
 walls.add(`256,64`);
-walls.add(`256,48`);
+walls.add(`256,48`);  */

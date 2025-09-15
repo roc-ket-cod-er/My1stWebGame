@@ -7,8 +7,9 @@ import { moveTowards } from "../../helpers/moveTowards.js";
 import { walls } from "../../levels/level1.js";
 import { Animations } from "../../animation.js";
 import { FrameIndexPattern } from "../../FrameIndexPattern.js";
-import { WALK_DOWN, WALK_LEFT, WALK_RIGHT, WALK_UP, STAND_DOWN, STAND_LEFT, STAND_RIGHT, STAND_UP } from "../../objects/Hero/heroAnimations.js";
+import { WALK_DOWN, WALK_LEFT, WALK_RIGHT, WALK_UP, STAND_DOWN, STAND_LEFT, STAND_RIGHT, STAND_UP, PICK_UP_DOWN } from "../../objects/Hero/heroAnimations.js";
 import { GameObject } from "../../GameObject.js";
+import { events } from "../../Events.js";
 
 export class Hero extends GameObject {
     constructor(x, y) {
@@ -41,22 +42,46 @@ export class Hero extends GameObject {
                 standLeft: new FrameIndexPattern(STAND_LEFT),
                 standUp: new FrameIndexPattern(STAND_UP),
                 standRight: new FrameIndexPattern(STAND_RIGHT),
+                pickUpDown: new FrameIndexPattern(PICK_UP_DOWN),
             })
         })
 
         this.addChild(this.body);
         this.facingDirection = DOWN;
         this.DestinationPosition = this.position.duplicate();
+        this.itemPickUpTime = 0;
+        this.itemPickupShell = null;
+
+        events.on("HERO_PICKS_UP_ITEM", this, data => {
+            this.onPickUpItem(data)
+        })
     }
 
     step(delta, root) {
+
+        if (this.itemPickUpTime > 0) {
+            this.workOnItemPickup(delta);
+            return;
+        }
+
         //console.log(this.DestinationPosition)d;
-        console.log(this.position);
+        //console.log(this.position);
         const distance = moveTowards(this, this.DestinationPosition, 1);
         const hasArrived = distance <= 1;
         if (hasArrived) {
             this.tryMove(root)
         }
+
+        this.tryEmitPosition();
+    }
+
+    tryEmitPosition() {
+        if (this.lastX === this.position.x && this.lastY === this.position.y) {
+            return;
+        }
+        this.lastX = this.position.x;
+        this.lastY = this.position.y;
+        events.emit("HERO_POSITION", this.position);
     }
 
     tryMove(root) {
@@ -100,6 +125,32 @@ export class Hero extends GameObject {
             this.DestinationPosition.y = nextY;
         } else {
             // window.location.href = "https://stackoverflow.com";
+        }
+    }
+
+    onPickUpItem({ image, position }) {
+        this.DestinationPosition = position.duplicate();
+
+        this.itemPickUpTime = 500;
+
+        this.itemPickupShell = new GameObject({});
+
+        this.itemPickupShell.addChild(
+            new Sprite({
+                resource: image,
+                position: new Vector2(0, -14)
+            })
+        )
+        this.addChild(this.itemPickupShell);      
+
+    }
+
+    workOnItemPickup(delta) {
+        this.itemPickUpTime -= delta;
+        this.body.animations.play("pickUpDown")
+
+        if (this.itemPickUpTime <= 0) {
+            this.itemPickupShell.destroy()
         }
     }
 }

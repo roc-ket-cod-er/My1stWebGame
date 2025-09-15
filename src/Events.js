@@ -3,6 +3,13 @@ class Events {
     nextId = 0;
 
     // Send events
+    emit(eventName, value) {
+        this.callbacks.forEach(stored => {
+            if (stored.eventName === eventName) {
+                stored.callback(value);
+            }
+        })
+    }
 
     // Subscribe to something
     on(eventName, caller, callback) {
@@ -17,6 +24,15 @@ class Events {
     }
 
     // leave subscription
+    off(id) {
+        this.callbacks = this.callbacks.filter((stored) => stored.id !== id);
+    }
+
+    unsubscribe(caller) {
+        this.callbacks = this.callbacks.filter(
+            (stored) => stored.caller !== caller
+        );
+    }
 }
 
 export const events = new Events();
