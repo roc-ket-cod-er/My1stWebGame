@@ -1,74 +1,52 @@
 import "./style.css"
-import {resources} from './src/Resource.js';
-import { Sprite } from "./src/sprite.js";
 import { Vector2 } from "./src/vector2.js";
 import { GameLoop } from "./src/GameLoop.js";
-import { Input} from "./src/Input.js";
-import { gridCells } from "./src/helpers/grid.js";
-import { GameObject } from "./src/GameObject.js";
-import { Hero } from "./src/objects/Hero/Hero.js";
-import { Camera } from "./src/Camera.js";
-import { Rod } from "./src/objects/Rod/Rod.js";
-import { Inventory } from "./src/objects/Inventory/Inventory.js";
-
+import { Main } from "./src/objects/Main/Main.js";
+import { CaveLevel1 } from "./src/levels/CaveLevel1.js";
 
 // Get Canvas To Draw To
 const canvas = document.querySelector("#game-canvas");
 const ctx = canvas.getContext("2d");
 
 // Establish Root Scene
-const mainScene = new GameObject({
+const mainScene = new Main({
     position: new Vector2(0,0)
 })
-
-// Add stuff to it
-const skySprite = new Sprite({
-    resource: resources.images.sky,
-    frameSize: new Vector2(320, 180),
-})
-
-const groundSprite = new Sprite({
-    resource: resources.images.ground,
-    frameSize: new Vector2(320, 180),
-})
-mainScene.addChild(groundSprite);
-
-
-const hero = new Hero(gridCells(6), gridCells(5));
-mainScene.addChild(hero);
-
-const camera = new Camera()
-mainScene.addChild(camera);
-
-const rod = new Rod(gridCells(7), gridCells(6));
-mainScene.addChild(rod);
-
-const inventory = new Inventory();
-
-
-// Add input class
-mainScene.input = new Input();
+//mainScene.setLevel(new OutdoorLevel1());
+mainScene.setLevel(new CaveLevel1());
 
 // Update and draw loops
 const update = (delta) => {
     mainScene.stepEntry(delta, mainScene);
+    mainScene.input?.update();
 };
+
 const draw = () => {
+
 
     ctx.clearRect(0, 0, canvas.clientWidth, canvas.height);
 
-    skySprite.draw(ctx, 0, 0)
+
+    mainScene.drawBackground(ctx);
+
 
     ctx.save();
 
-    ctx.translate(camera.position.x, camera.position.y);
 
-    mainScene.draw(ctx, 0, 0);
+    if (mainScene.camera) {
+        ctx.translate(mainScene.camera.position.x, mainScene.camera.position.y);
+    }
+
+
+    mainScene.drawObjects(ctx);
+
 
     ctx.restore();
 
-    inventory.draw(ctx, 0, 0);
+
+    mainScene.drawForeground(ctx);
 }
+
 
 // Start the game
 const gameLoop = new GameLoop(update, draw);

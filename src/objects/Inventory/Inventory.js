@@ -10,6 +10,8 @@ export class Inventory extends GameObject {
             position: new Vector2(0, 2)
         });
 
+        this.drawLayer = "HUD";
+
         this.nextId = 0;
         this.items = [
             {

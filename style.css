@@ -9,3 +9,8 @@ canvas {
   width: 100%;
   background: blue;
 }
+
+@font-face {
+  font-family: fontRetroGaming;
+  src: url("/fonts/Retro Gaming.ttf");
+}

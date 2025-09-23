@@ -2,9 +2,8 @@ import { Sprite } from "../../sprite.js";
 import { resources } from "../../Resource";
 import { Vector2 } from "../../vector2.js";
 import { DOWN, Input, LEFT, RIGHT, UP } from "../../Input.js";
-import { gridCells, isSpaceFree } from "../../helpers/grid.js";
+import { isSpaceFree } from "../../helpers/grid.js";
 import { moveTowards } from "../../helpers/moveTowards.js";
-import { walls } from "../../levels/level1.js";
 import { Animations } from "../../animation.js";
 import { FrameIndexPattern } from "../../FrameIndexPattern.js";
 import { WALK_DOWN, WALK_LEFT, WALK_RIGHT, WALK_UP, STAND_DOWN, STAND_LEFT, STAND_RIGHT, STAND_UP, PICK_UP_DOWN } from "../../objects/Hero/heroAnimations.js";
@@ -51,21 +50,48 @@ export class Hero extends GameObject {
         this.DestinationPosition = this.position.duplicate();
         this.itemPickUpTime = 0;
         this.itemPickupShell = null;
+        this.isLocked = false;
 
         events.on("HERO_PICKS_UP_ITEM", this, data => {
             this.onPickUpItem(data)
         })
     }
 
+    ready() {
+        events.on("START_TEXT_BOX", this, () => {
+            this.isLocked = true;
+        })
+        events.on("END_TEXT_BOX", this, () => {
+            this.isLocked = false;
+        })
+    }
+
     step(delta, root) {
+
+        if (this.isLocked) {
+            return;
+        }
 
         if (this.itemPickUpTime > 0) {
             this.workOnItemPickup(delta);
             return;
         }
 
-        //console.log(this.DestinationPosition)d;
-        //console.log(this.position);
+        
+        /** @type {Input} */
+        const input = root.input;
+        if (input?.getActionJustPressed("Space")) {
+            console.log("ACTION!");
+
+            const objAtPosition = this.parent.children.find(child => {
+                return child.position.matches(this.position.toNeighbor(this.facingDirection))
+            })
+            
+            if (objAtPosition) {
+                events.emit("HERO_REQUESTS_ACTION", objAtPosition)
+            }
+        }
+
         const distance = moveTowards(this, this.DestinationPosition, 1);
         const hasArrived = distance <= 1;
         if (hasArrived) {
@@ -120,7 +146,14 @@ export class Hero extends GameObject {
         this.facingDirection = input.direction ?? this.facingDirection;
 
         // Make sure the desired position is free
-        if (isSpaceFree(walls, nextX, nextY)) {
+
+        const spaceIsFree = isSpaceFree(root.level?.walls, nextX, nextY);
+
+        const solidBodyAtSpace = this.parent.children.find(c => {
+            return c.isSolid && c.position.x === nextX && c.position.y === nextY
+        })
+
+        if (spaceIsFree && !solidBodyAtSpace) {
             this.DestinationPosition.x = nextX;
             this.DestinationPosition.y = nextY;
         } else {
