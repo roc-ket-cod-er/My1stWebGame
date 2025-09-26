@@ -2,6 +2,7 @@ import { events } from "../../Events";
 import { GameObject } from "../../GameObject";
 import { resources } from "../../Resource";
 import { Sprite } from "../../sprite";
+import { GOT_GEM_1, GOT_GEM_2, storyFlags } from "../../StoryFlags";
 import { Vector2 } from "../../vector2";
 
 export class Inventory extends GameObject {
@@ -14,14 +15,14 @@ export class Inventory extends GameObject {
 
         this.nextId = 0;
         this.items = [
-            {
+            /*{
                 id: -2,
                 image: resources.images.rod
             },
             {
                 id: -1,
                 image: resources.images.rod
-            }, 
+            }, */
         ]
 
         events.on("HERO_PICKS_UP_ITEM", this, data=>{
@@ -31,6 +32,17 @@ export class Inventory extends GameObject {
                 image: resources.images.rod,
             })
             this.renderInventory();
+
+            //console.log(storyFlags.flags)
+
+            if (data.level === 'LEVEL 1') {
+                storyFlags.add(GOT_GEM_1);
+            } else {
+                storyFlags.add(GOT_GEM_2)
+            }
+
+            //console.log(storyFlags.flags);
+            //console.log(data.level);
         })
 
         // removing demo

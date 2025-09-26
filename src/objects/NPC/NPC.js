@@ -17,6 +17,8 @@ export class NPC extends GameObject {
         this.textContent = textContent.content;
         this.textPortraiFrame = textContent.portrait;
 
+        this.call_back = textContent.call_back ?? this.nothing;
+
         // Shadow
         const shadow = new Sprite({
             resource: resources.images.shadow,
@@ -43,13 +45,19 @@ export class NPC extends GameObject {
         const match = storyFlags.getRelevantScenario(this.textContent);
         if (!match) {
             console.warn("No matches found in this list", this.textContent);
+            console.log(storyFlags.flags);
             return null;
         }
 
+        this.call_back()
         return {
             portraitFrame: this.textPortraiFrame,
             string: match.string,
             addsFlag: match.addsFlag ?? null,
         }
+    }
+
+    nothing () {
+        
     }
 }

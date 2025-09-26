@@ -8,6 +8,8 @@ import { Vector2 } from "../vector2";
 import { gridCells } from "../helpers/grid";
 import { CaveLevel1 } from "./CaveLevel1";
 import { events } from "../Events";
+import { BOT1_TALK1, BOT1_TALK2, BOT1_TALK3, BOT1_TALK4, GOT_GEM_1, GOT_GEM_2, storyFlags, TALKED_TO_A, TALKED_TO_B } from "../StoryFlags";
+import { NPC } from "../objects/NPC/NPC";
 
 const DEFAULT_HERO_POSITION = new Vector2(gridCells(6), gridCells(5));
 
@@ -33,10 +35,63 @@ export class OutdoorLevel1 extends Level {
         const hero = new Hero(this.heroStart.x, this.heroStart.y);
         this.addChild(hero);
         
-        const rod = new Rod(gridCells(7), gridCells(6));
-        this.addChild(rod);
+        if (!storyFlags.getRelevantScenario([{requires: [GOT_GEM_1]}])) {
+            const rod = new Rod(gridCells(9), gridCells(6), "LEVEL 1");
+            this.addChild(rod);
+        }
+
+        const npc1 = new NPC(gridCells(12), gridCells(2), {
+            content: [
+                {
+                    string: "Hiya! I am the helper bot. Throughout the game you will have to use double space to continue a conversation.",
+                    addsFlag: BOT1_TALK1,
+                    bypass: [BOT1_TALK1],
+                },
+                {
+                    string: "Great! Looks like you got the game figured out! ... ",
+                    requires: [BOT1_TALK1],
+                    bypass: [BOT1_TALK2],
+                    addsFlag: BOT1_TALK2,
+                },
+                {
+                    string: "Your goal is to collect 2 gems. Oh look there's one! Come back once you have collected your first.",
+                    addsFlag: BOT1_TALK3,
+                    bypass: [GOT_GEM_1, GOT_GEM_2],
+                    requires: [BOT1_TALK2],
+                },
+                {
+                    string: "Great! You collected your first gem! Now, using the stairs to the left, take a look at the lower level!",
+                    addsFlag: BOT1_TALK4,
+                    bypass: [GOT_GEM_2, TALKED_TO_A, TALKED_TO_B],
+                },
+                {
+                    string: "You should probably talk to the other Knights...",
+                    requires: [GOT_GEM_1, GOT_GEM_2],
+                    bypass: [TALKED_TO_B],
+                },
+                {
+                    string: "Congrats! Now you can go to the house!",
+                    requires: [GOT_GEM_1, GOT_GEM_2, TALKED_TO_A, TALKED_TO_B]
+                },
+                {
+                    string: "Your goal is to collect 2 gems. Come back once you're done",
+                    bypass: [GOT_GEM_1, GOT_GEM_2]
+                },
+                {
+                    string: "..."
+                }
+            ],
+            portrait: 1,
+        });
+        this.addChild(npc1);
+
+
+
 
         this.walls = new Set();
+        this.house = new Set();
+
+        this.house.add(`224,64`)
 
         this.walls.add(`64,48`);
         
@@ -49,8 +104,8 @@ export class OutdoorLevel1 extends Level {
         this.walls.add(`128,80`);
         this.walls.add(`144,80`);
         this.walls.add(`160,80`);
-
-        /*
+        
+        
 
         this.walls.add(`128,48`);
         this.walls.add(`144,48`);
@@ -101,7 +156,7 @@ export class OutdoorLevel1 extends Level {
         this.walls.add(`256,96`);
         this.walls.add(`256,80`);
         this.walls.add(`256,64`);
-        this.walls.add(`256,48`);  */
+        this.walls.add(`256,48`);  
     }
 
     ready() {

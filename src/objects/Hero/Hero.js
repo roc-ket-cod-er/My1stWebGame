@@ -9,6 +9,7 @@ import { FrameIndexPattern } from "../../FrameIndexPattern.js";
 import { WALK_DOWN, WALK_LEFT, WALK_RIGHT, WALK_UP, STAND_DOWN, STAND_LEFT, STAND_RIGHT, STAND_UP, PICK_UP_DOWN } from "../../objects/Hero/heroAnimations.js";
 import { GameObject } from "../../GameObject.js";
 import { events } from "../../Events.js";
+import { GOT_GEM_1, GOT_GEM_2, storyFlags, TALKED_TO_A, TALKED_TO_B } from "../../StoryFlags.js";
 
 export class Hero extends GameObject {
     constructor(x, y) {
@@ -101,12 +102,22 @@ export class Hero extends GameObject {
         this.tryEmitPosition();
     }
 
+    isHouseThere(housepos, x, y) {
+        //console.log(housepos, x, y)
+        const str = `${x},${y}`;
+
+        const isHousePresent = housepos.has(str);
+        //console.log(isHousePresent)
+        return !isHousePresent;
+    }
+
     tryEmitPosition() {
         if (this.lastX === this.position.x && this.lastY === this.position.y) {
             return;
         }
         this.lastX = this.position.x;
         this.lastY = this.position.y;
+        console.log(this.position);
         events.emit("HERO_POSITION", this.position);
     }
 
@@ -140,7 +151,7 @@ export class Hero extends GameObject {
             this.body.animations.play("walkRight");
         }
         if (input.direction === UP) {
-            nextY -= gridSize;
+            nextY -= gridSize;d
             this.body.animations.play("walkUp");
         }
         this.facingDirection = input.direction ?? this.facingDirection;
@@ -148,6 +159,15 @@ export class Hero extends GameObject {
         // Make sure the desired position is free
 
         const spaceIsFree = isSpaceFree(root.level?.walls, nextX, nextY);
+        const isHouse = !this.isHouseThere(root.level?.house, nextX, nextY);
+
+        if (isHouse) {
+            const canEndGame = storyFlags.getRelevantScenario([{requires: [GOT_GEM_1, GOT_GEM_2, TALKED_TO_A, TALKED_TO_B]}]);
+            if (canEndGame) {
+                console.error("GAME OVER!!")
+                window.location.replace("../WIN/")
+            }
+        }
 
         const solidBodyAtSpace = this.parent.children.find(c => {
             return c.isSolid && c.position.x === nextX && c.position.y === nextY
@@ -156,8 +176,6 @@ export class Hero extends GameObject {
         if (spaceIsFree && !solidBodyAtSpace) {
             this.DestinationPosition.x = nextX;
             this.DestinationPosition.y = nextY;
-        } else {
-            // window.location.href = "https://stackoverflow.com";
         }
     }
 

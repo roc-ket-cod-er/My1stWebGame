@@ -9,7 +9,7 @@ import { Vector2 } from "../vector2";
 import { events } from "../Events";
 import { OutdoorLevel1 } from "../levels/OutdoorLevel1"
 import { NPC } from "../objects/NPC/NPC";
-import { TALKED_TO_A, TALKED_TO_B } from "../StoryFlags";
+import { ENABLE_GEM3, ENABLE_GEM4, GOT_GEM_1, GOT_GEM_2, storyFlags, TALKED_TO_A, TALKED_TO_B } from "../StoryFlags";
 
 const DEFAULT_HERO_POSITION = new Vector2(gridCells(6), gridCells(5))
 
@@ -34,24 +34,29 @@ export class CaveLevel1 extends Level {
         const hero = new Hero(this.heroStart.x, this.heroStart.y);
         this.addChild(hero);
 
-        const rod = new Rod(gridCells(9), gridCells(6));
-        this.addChild(rod);
+
+        if (!storyFlags.getRelevantScenario([{requires: [GOT_GEM_2]}])) {
+            const rod = new Rod(gridCells(9), gridCells(6), "LEVEL 2");
+            this.addChild(rod);
+        }
 
         const npc1 = new NPC(gridCells(5), gridCells(5), {
             content: [
                 {
-                    string: "I just can't stand that guy.",
-                    requires: [TALKED_TO_B],
-                    bypass: [TALKED_TO_A],
-                    addsFlag: TALKED_TO_A,
+                    string: "You have begun your mission, have you?",
+                    bypass: [GOT_GEM_1, GOT_GEM_2]
                 },
                 {
-                    string: "He is just the worst!",
+                    string: "Oh really? Well then I guess I will let you go...",
+                    requires: [TALKED_TO_B],
+                    addsFlag: TALKED_TO_A
+                },
+                {
+                    string: "You should talk to the Knight on the upper level...",
                     requires: [TALKED_TO_A],
                 },
                 {
-                    string: "Grumble grumble. Another day at work",
-                    requires: [],
+                    string: "Keep it up!"
                 }
             ],
             portrait: 1,
@@ -61,16 +66,39 @@ export class CaveLevel1 extends Level {
         const npc2 = new NPC(gridCells(8), gridCells(5), {
             content: [
                 {
-                    string: "What a wonderful day to work in the cave, eh??",
-                    requires: [],
+                    string: "If you want to move on, tell the other guy the queen asks for you to be let through",
+                    bypass: [TALKED_TO_B],
                     addsFlag: TALKED_TO_B,
+                },
+                {
+                    string: "Go on now ...",
+                    requires: [TALKED_TO_B],
+                },
+                {
+                    string: "..."
                 }
             ],
-            portrait: 0,
+            portrait: 1,
         });
         this.addChild(npc2);
 
         this.walls = new Set();
+        this.house = new Set();
+
+this.walls.add("16,16");
+this.walls.add("16,32");
+this.walls.add("16,48");
+this.walls.add("16,64");
+this.walls.add("16,80");
+this.walls.add("16,96");
+this.walls.add("16,112");
+this.walls.add("32,128");
+this.walls.add("48,128");
+this.walls.add("64,128");
+this.walls.add("80,128");
+this.walls.add("96,128");
+this.walls.add("112,128");
+this.walls.add("127,128");
     }
 
     ready() {
@@ -80,5 +108,10 @@ export class CaveLevel1 extends Level {
                 heroPosition: new Vector2(gridCells(6), gridCells(4))
             }))
         })
+    }
+
+    replenish() {
+        storyFlags.add(ENABLE_GEM3)
+        storyFlags.add(ENABLE_GEM4);
     }
 }

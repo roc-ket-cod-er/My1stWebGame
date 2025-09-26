@@ -5,7 +5,7 @@ import { Sprite } from "../../sprite";
 import { Vector2 } from "../../vector2";
 
 export class Rod extends GameObject {
-    constructor(x, y) {
+    constructor(x, y, level) {
         super({
             position: new Vector2(x, y)
         });
@@ -14,7 +14,7 @@ export class Rod extends GameObject {
             position: new Vector2(0, -5),
         })
         this.addChild(sprite);
-
+        this.level = level;
 
     }
 
@@ -36,7 +36,8 @@ export class Rod extends GameObject {
 
         events.emit("HERO_PICKS_UP_ITEM", {
             image: resources.images.rod,
-            position: this.position
+            position: this.position,
+            level: this.level,
         })
     }
 }

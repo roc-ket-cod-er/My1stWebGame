@@ -50,7 +50,7 @@ export class SpriteTextString extends GameObject {
 
         this.showingIndex = 0;
         this.finalIndex = this.words.reduce((acc, word) => acc + word.chars.length, 0)
-        this.textSpeed = 40;
+        this.textSpeed = 30;
         this.timeUntilNextShow = this.textSpeed;
     }
 
