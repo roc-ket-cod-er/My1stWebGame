@@ -8,7 +8,7 @@ import { getCharacterFrame, getCharacterWidth } from "./spriteFontMap";
 export class SpriteTextString extends GameObject {
     constructor(config={}) {
         super({
-            position: new Vector2(32, 108),
+            position: new Vector2(32, 95),
         });
 
         this.drawLayer = "HUD";

@@ -2,10 +2,9 @@ import "./style.css"
 import { Vector2 } from "./src/vector2.js";
 import { GameLoop } from "./src/GameLoop.js";
 import { Main } from "./src/objects/Main/Main.js";
-import { CaveLevel1 } from "./src/levels/CaveLevel1.js";
 import { OutdoorLevel1 } from "./src/levels/OutdoorLevel1.js";
 
-if (!confirm("Use Arrows / WASD and Space for action")){
+if (!confirm("Use Arrows / WASD to move, space for action.")) {
     throw new Error();
 }
 

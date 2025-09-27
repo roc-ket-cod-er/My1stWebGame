@@ -43,7 +43,7 @@ export class OutdoorLevel1 extends Level {
         const npc1 = new NPC(gridCells(12), gridCells(2), {
             content: [
                 {
-                    string: "Hiya! I am the helper bot. Throughout the game you will have to use double space to continue a conversation.",
+                    string: "Hiya! I am the helper bot. I recommend full screening with F11. Use Double Space To Continue.",
                     addsFlag: BOT1_TALK1,
                     bypass: [BOT1_TALK1],
                 },
@@ -70,7 +70,7 @@ export class OutdoorLevel1 extends Level {
                     bypass: [TALKED_TO_B],
                 },
                 {
-                    string: "Congrats! Now you can go to the house!",
+                    string: "Congrats! Now you can go to the house! Do make sure to walk into it!",
                     requires: [GOT_GEM_1, GOT_GEM_2, TALKED_TO_A, TALKED_TO_B]
                 },
                 {
@@ -156,14 +156,14 @@ export class OutdoorLevel1 extends Level {
         this.walls.add(`256,96`);
         this.walls.add(`256,80`);
         this.walls.add(`256,64`);
-        this.walls.add(`256,48`);  
+        this.walls.add(`256,48`);
     }
 
     ready() {
         events.on("HERO_EXITS", this, () => {
             console.log("CHANGE THE MAP!!");
             events.emit("CHANGE_LEVEL", new CaveLevel1({
-                heroPosition: new Vector2(gridCells(3), gridCells(6))
+                heroPosition: new Vector2(gridCells(4), gridCells(5))
             }))
         })
     }

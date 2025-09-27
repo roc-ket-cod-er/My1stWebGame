@@ -151,7 +151,7 @@ export class Hero extends GameObject {
             this.body.animations.play("walkRight");
         }
         if (input.direction === UP) {
-            nextY -= gridSize;d
+            nextY -= gridSize;
             this.body.animations.play("walkUp");
         }
         this.facingDirection = input.direction ?? this.facingDirection;
@@ -164,8 +164,8 @@ export class Hero extends GameObject {
         if (isHouse) {
             const canEndGame = storyFlags.getRelevantScenario([{requires: [GOT_GEM_1, GOT_GEM_2, TALKED_TO_A, TALKED_TO_B]}]);
             if (canEndGame) {
-                console.error("GAME OVER!!")
-                window.location.replace("../WIN/")
+                console.log("WANT TO END")
+                events.emit("HERO_REQUESTS_ACTION", "END")
             }
         }
 

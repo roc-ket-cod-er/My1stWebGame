@@ -24,17 +24,33 @@ export class Main extends GameObject {
 
         events.on("HERO_REQUESTS_ACTION", this, (withObject) => {
 
-                if (typeof withObject.getContent === "function") {
-                    const content = withObject.getContent();
-
+            if (typeof withObject.getContent === "function") {
+                const content = withObject.getContent();
                 if (!content) {
-                    return;
+                        return;
                 }
 
                 if (content.addsFlag) {
                     console.log("ADD FLAG", content.addsFlag);
                     storyFlags.add(content.addsFlag);
                 }
+
+                console.log(content.string);
+
+                const textbox = new SpriteTextString({
+                    portraitFrame: content.portraitFrame,
+                    string: content.string,
+
+                });
+                this.addChild(textbox);
+                events.emit("START_TEXT_BOX");
+
+                const endingSub = events.on("END_TEXT_BOX", this, () => {
+                    textbox.destroy();
+                    events.off(endingSub);
+                })
+            } else {
+                const content = {string:"GAME OVER! WELL PLAYED!", portraitFrame: null, addsFlag: null};
 
                 const textbox = new SpriteTextString({
                     portraitFrame: content.portraitFrame,

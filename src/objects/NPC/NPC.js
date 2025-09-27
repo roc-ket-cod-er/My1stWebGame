@@ -49,7 +49,8 @@ export class NPC extends GameObject {
             return null;
         }
 
-        this.call_back()
+        this.call_back();
+
         return {
             portraitFrame: this.textPortraiFrame,
             string: match.string,
